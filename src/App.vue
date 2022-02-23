@@ -161,7 +161,6 @@
 }
 </style>
 
-
 <script>
 
 // Load data from csv files as javascript arrays with objects
