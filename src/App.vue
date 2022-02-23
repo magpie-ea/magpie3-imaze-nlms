@@ -174,7 +174,6 @@ import _ from 'lodash';
 
 // wrangle trial data
 
-
 var makeMainTrials = function() {
   return(_.shuffle(_.map(conditions, function(c) {
   var matchingTrials = _.filter(imaze_trials, function(t) {
