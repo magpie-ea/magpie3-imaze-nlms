@@ -13,7 +13,7 @@
         Remember to try to select the best next word the sequence 
         as fast and reliably as possible.
         <br>
-        Press F for the left word and J for the rigth word on the screen.
+        Press F for the left word and J for the right word on the screen.
       </Slide>
 
       <template v-for="(target, j) of trial.targets.split('|')">
