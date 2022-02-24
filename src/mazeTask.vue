@@ -1,122 +1,64 @@
-<!-- <docs> -->
+  <template>
 
-<!-- ```vue -->
-<!-- <Experiment> -->
-<!--     <Screen> -->
-<!--         <mazeTask -->
-<!--           :targets="['The', 'kale', 'is', 'stale'.]" -->
-<!--           :competitors="['Dha', 'rals', 'bo', 'tsule'.]" -->
-<!--           :keys="{'f': 'left', 'j' : 'right'}" -->
-<!--           :response-times.sync="$magpie.measurements.times" /> -->
-<!--     </Screen> -->
+    <Screen>
 
-<!--     <DebugResultsScreen /> -->
-<!-- </Experiment> -->
-<!-- ``` -->
+      <Slide>
+          <KeypressInput
+            :keys="{' ': 'continue'}"
+            :showOptions="false"
+            @update:response="prepareNextTrial(trial);$magpie.nextSlide();"
+            />
+        Press Space to start the next trial.
+        <br>
+        Remember to try to select the best next word the sequence 
+        as fast and reliably as possible.
+        <br>
+        Press F for the left word and J for the rigth word on the screen.
+      </Slide>
 
-<!-- </docs> -->
+      <template v-for="(target, j) of trial.targets.split('|')">
 
+        <Slide :key="'word_' + j">
 
-<template>
-<div>
-  something else
-  <!-- @slot optional stimulus content -->
-  <!-- <slot name="stimulus"></slot> -->
-  <template v-for="(pair, i) in wordPairs">
-  <KeypressInput
-    :keys="keys"
-    :key="i"
-    :showOptions="false"
-    @update:response="nextWord"
-    />
+          <template v-if=" correct == 'true' ">
+          <KeypressInput
+            :keys="{'f': 'left', 'j' : 'right'}"
+            :showOptions="false"
+            :response.sync="$magpie.measurements.response"
+            @update:response="nextWord($magpie.measurements.response,j)"
+            />
 
-    <div class="options">
-        <div class="options">
-          <div
-            class="option"
-            >
-            {{ pair[0] }}
-          </div>
-          <div
-            class="option"
-            >
-            {{ pair[1] }}
-          </div>
-        </div>
-    </div>
+            <div class="options">
+              <div
+                class="option"
+                >
+                {{ getLeftOption(j) }}
+              </div>
+              <div
+                class="option"
+                >
+                {{ getRightOption(j) }}
+              </div>
+            </div>
+
+          </template>
+
+          <template v-if=" correct == 'false' ">
+            <KeypressInput
+            :keys="{' ': 'continue'}"
+            :showOptions="false"
+            :response.sync="$magpie.measurements.response"
+            @update:response="$magpie.nextScreen()"
+            />
+            Ops! That was not correct. Press Space to continue.
+          </template>
+        </Slide>
+
+      </template>
+
+    </Screen>
 
   </template>
-  <!-- @slot task content, displayed after the whole text was read -->
-  <!-- <template v-if="word >= targets.length"> -->
-  <!--   <Wait :time="0" @done="$emit('end')" /> -->
-  <!-- </template> -->
-</div>
-</template>
-
-<script>
-// import KeypressInput from '../inputs/KeypressInput';
-// import Wait from '../helpers/Wait';
-export default {
-  name: 'mazeTask',
-  // components: { KeypressInput, Wait },
-  props: {
-    /**
-     * maze-task target words
-     */
-    targets: {
-      type: Array,
-      required: true
-    },
-    /**
-     * Array of word pairs (target, distractor)
-     */
-    wordPairs: {
-      type: Array,
-      required: true
-    },
-    /**
-     * Give instructions on what the participant is supposed to do
-     */
-    instructions: {
-      type: String,
-      default: 'Press F for left word and J for right word.'
-    },
-    /**
-     * The key to press to reveal the next word
-     */
-    keys: {
-      type: Object,
-      default: {'f': 'left', 'j' : 'right'}
-    }
-  },
-  data() {
-    return {
-      word: -1,
-      responseTimes: [],
-      startTime: null,
-      slide: 0
-    };
-  },
-  methods: {
-    nextSlide() {
-      this.slide++;
-      console.log('slide increment')
-    },
-    nextWord() {
-      console.log('word increment')
-      if (this.word > -1) {
-        this.responseTimes.push(Date.now() - this.startTime);
-      }
-      this.word++;
-      this.startTime = Date.now();
-      if (this.word === this.targets.length-1) {
-          console.log('final word pair reached')
-        this.$emit('update:response-times', this.responseTimes);
-      }
-    }
-  }
-};
-</script>
 
 <style scoped>
 .option {
@@ -127,7 +69,7 @@ export default {
   cursor: pointer;
   display: inline-block;
   font-family: 'Lato', 'Noto Sans', sans-serif;
-  font-size: 50px;
+  font-size: 40px;
   line-height: 40px;
   font-weight: 700;
   letter-spacing: 0.9px;
@@ -140,3 +82,112 @@ export default {
   background-color: #324d93;
 }
 </style>
+
+<script>
+import _ from 'lodash';
+
+var responseTimes = []
+var responses     = []
+var startTime     = null
+var targets       = []
+var competitors   = []
+var targetOnLeft  = []
+var wordOnRight   = "Dummy"
+var wordOnLeft    = "Yummy"
+var nWords        = 0
+var correct       = 'true'
+
+var prepareNextTrial = function(trial){
+    this.responseTimes = [];
+    this.responses     = []
+    this.startTime     = Date.now()
+    this.targets       = trial.targets.split("|")
+    this.competitors   = trial.competitors.split("|")
+    this.nWords        = trial.targets.split("|").length
+    this.correct       = 'true'
+    this.targetOnLeft  = _.map(
+        _.range(trial.targets.split("|").length),
+        function(x) {return (_.random()) })
+    this.wordOnLeft    = targetOnLeft[0] == 1 ? targets[0] : competitors[0]
+    this.wordOnRight   = targetOnLeft[0] == 0 ? targets[0] : competitors[0]
+}
+
+var getLeftOption = function(j) {
+    return (this.targetOnLeft[j] == 1 ? this.targets[j] : this.competitors[j])
+}
+
+var getRightOption = function(j) {
+    return (this.targetOnLeft[j] == 0 ? this.targets[j] : this.competitors[j])
+}
+var checkCorrect = function(){
+    console.log(this.correct)
+    return (this.correct)
+}
+var nextWord = function(response,j) {
+    // console.sole.log('response given: ' + $magpie.measurements.response)
+    // console.log('word increment: ', word)
+    this.responseTimes.push(Date.now() - this.startTime);
+    var decodedResponse = response == 'right' ?
+        this.getRightOption(j) : this.getLeftOption(j);
+    this.responses.push(decodedResponse)
+    if (decodedResponse != this.targets[j]) {
+        console.log('wrong')
+        this.$magpie.addTrialData({
+            'RTs' : this.responseTimes,
+            'responses' : this.responses,
+            'aborted' : 'true'
+        })
+        this.correct = 'false'
+        // $magpie.nextSlide()
+    }
+    if (j < this.nWords-1) {
+        this.startTime = Date.now();
+        this.$magpie.nextSlide()
+    } else if (j === this.nWords-1) {
+        console.log('final word pair reached')
+        console.log('final RTs:', this.responseTimes)
+        if (this.correct == 'true') {
+            this.$magpie.addTrialData({
+                'RTs' : this.responseTimes,
+                'responses' : this.responses,
+                'aborted' : 'false'
+            })
+        }
+        this.$magpie.nextScreen()
+    }
+}
+
+export default {
+    name: 'mazeTask',
+    props: {
+        trial: {
+            type: Object,
+            required: true
+        },
+        trialNR: {
+          type: Number,
+          required: true
+        }
+    },
+    data() {
+        return {
+            targets,
+            competitors,
+            targetOnLeft,
+            nWords,
+            wordOnLeft,
+            wordOnRight,
+            correct
+        };
+    },
+    methods: {
+        nextWord         : nextWord,
+        prepareNextTrial : prepareNextTrial,
+        getLeftOption    : getLeftOption,
+        getRightOption   : getRightOption,
+        checkCorrect     : checkCorrect
+    }
+};
+
+</script>
+

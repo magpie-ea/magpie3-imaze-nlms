@@ -1,117 +1,53 @@
 <template>
 <Experiment title="magpie3-imaze-nlms">
-  <!-- <InstructionScreen :title="'Welcome'">
-    This is a sample introduction screen.
-  </InstructionScreen> -->
+  
+  <InstructionScreen :title="'Welcome'">
+    Thank you for taking part in this experiment. 
+    Your participation is voluntary. 
+    You may quit any time.
+    <br>
+    Data collected in this experiment is completely anonymous and will be used
+    for scientific purposes only.
+  </InstructionScreen>
 
-  <!-- <InstructionScreen :title="'General Instructions'"> -->
-    <!--   This is a sample instructions view. -->
-    <!--   <br /> -->
-    <!--   <br /> -->
-    <!--   First you will go through two practice trials. The practice trial view -->
-    <!--   uses magpie's forced choice trial input. -->
-    <!-- </InstructionScreen> -->
-
-
-  <!-- <template v-for="(screen, i) of [1,2,3,4]"> -->
-
-  <!--   <Screen :key="'screen'+i"> -->
-  <!--     <Slide> -->
-  <!--       <KeypressInput -->
-  <!--         :keys="{' ': 'continue'}" -->
-  <!--         :showOptions="false" -->
-  <!--         @update:response="$magpie.nextSlide();" -->
-  <!--         /> -->
-  <!--       Starting slide. -->
-  <!--       Press Space to continue. -->
-  <!--     </Slide> -->
-
-  <!--     <template v-for="(slide, j) of [1,2,3,4]"> -->
-
-  <!--       <Slide :key="'slide'+j"> -->
-  <!--         <KeypressInput -->
-  <!--           :keys="{' ': 'continue'}" -->
-  <!--           :showOptions="false" -->
-  <!--           @update:response="slide >= 2 ? $magpie.nextScreen() : $magpie.nextSlide();" -->
-  <!--           /> -->
-  <!--         Slide {{slide}} of Screen {{screen}}. -->
-  <!--         Press Space to continue. -->
-  <!--       </Slide> -->
-
-  <!--     </template> -->
-
-  <!--   </Screen> -->
-  <!-- </template> -->
+  <InstructionScreen :title="'General Instructions'"> 
+    Your task is to read sentences word-by-word.
+    The catch is that you will always see two candidate words on the screen.
+    Only one of the two words is the one you should choose.
+    The other word is a lure.
+    The lure may be non-word, just nonsense like "oquitr".
+    The lure may also be real English word, but an ungrammatical
+    continuation of the sentence.
+    In rare cases, both the correct word and the lure word could be grammatical
+    continuations of the sentence, in which case you should guess the more likely
+    continuation based on the sentences meaning.
+    <br /> 
+    <br /> 
+    In sum: Your task is to always choose the correct word on the screen 
+    as fast and accurately as possible.
+    <br /> 
+    <br />
+    We will start with a few practice trials.
+    <br /> 
+    <br />
+    Press F to select the right word, and J to select the left word on the screen.
+  </InstructionScreen>
 
 <!-- practice trials -->
 
-<!-- main trials -->
+  <template v-for="(trial, i) of practiceTrials">
+    <mazeTask :trial="trial" :trialNR="i" :key="i"/>
+  </template>
 
+  <InstructionScreen :title="'Pause'">
+    You have completed the first block. Take a break if you want.
+  </InstructionScreen>
 
   <template v-for="(trial, i) of mainTrials1">
-
-    <Screen 
-      :key="'trial_'+ i"
-      :progress="i / mainTrials1.length"
-    >
-
-      <Slide>
-          <KeypressInput
-            :keys="{' ': 'continue'}"
-            :showOptions="false"
-            @update:response="prepareNextTrial(trial);$magpie.nextSlide();"
-            />
-        Press Space to start the next trial.
-      </Slide>
-
-      <template v-for="(target, j) of trial.targets.split('|')">
-
-        <Slide :key="'word_' + j">
-
-          <template v-if=" correct == 'true' ">
-          <KeypressInput
-            :keys="{'f': 'left', 'j' : 'right'}"
-            :showOptions="false"
-            :response.sync="$magpie.measurements.response"
-            @update:response="nextWord($magpie.measurements.response,j)"
-            />
-
-            <div class="options">
-              <div
-                class="option"
-                >
-                {{ getLeftOption(j) }}
-              </div>
-              <div
-                class="option"
-                >
-                {{ getRightOption(j) }}
-              </div>
-            </div>
-
-          </template>
-
-          <template v-if=" correct == 'false' ">
-            <KeypressInput
-            :keys="{' ': 'continue'}"
-            :showOptions="false"
-            :response.sync="$magpie.measurements.response"
-            @update:response="$magpie.nextScreen()"
-            />
-            Ops! That was not correct. Press Space to continue.
-          </template>
-        </Slide>
-
-      </template>
-
-    </Screen>
-
+    <mazeTask :trial="trial" :trialNR="i" :key="i"/>
   </template>
 
 
-  <InstructionScreen :title="'Welcome'">
-    You have completed the first block. Take a break if you want.
-  </InstructionScreen>
 
 
   <!--
@@ -136,28 +72,7 @@
 </template>
 
 
-<style scoped>
-.option {
-  background-color: #5187ba;
-  border: none;
-  border-radius: 2px;
-  color: white;
-  cursor: pointer;
-  display: inline-block;
-  font-family: 'Lato', 'Noto Sans', sans-serif;
-  font-size: 40px;
-  line-height: 40px;
-  font-weight: 700;
-  letter-spacing: 0.9px;
-  margin: 0 70px 70px 70px;
-  outline: none;
-  padding: 5px 10px;
-  text-transform: uppercase;
-}
-.option:hover {
-  background-color: #324d93;
-}
-</style>
+
 
 <script>
 
@@ -166,7 +81,7 @@ import imaze_trials from '../trials/imaze-trials-full.csv';
 import conditions from '../trials/conditions.csv'
 import practiceTrials from '../trials/imaze-trials-practice.csv'
 import fillers from '../trials/imaze-trials-fillers.csv'
-import mazeTask from './mazeTask.vue'
+import mazeTask from './mazeTask'
 import _ from 'lodash';
 
 // wrangle trial data
@@ -261,6 +176,8 @@ export default {
             mainTrials1,
             mainTrials2,
             targets,
+            practiceTrials,
+            fillers,
             competitors,
             targetOnLeft,
             nWords,
