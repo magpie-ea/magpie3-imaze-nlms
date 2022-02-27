@@ -133,7 +133,6 @@ var nextWord = function(response,j) {
         this.getRightOption(j) : this.getLeftOption(j);
     this.responses.push(decodedResponse)
     if (decodedResponse != this.targets[j]) {
-        console.log('wrong')
           this.$magpie.addTrialData(
               Object.assign(
                 this.trial, 
@@ -151,8 +150,6 @@ var nextWord = function(response,j) {
         this.startTime = Date.now();
         this.$magpie.nextSlide()
     } else if (j === this.nWords-1) {
-        console.log('final word pair reached')
-        console.log('final RTs:', this.responseTimes)
         if (this.correct == 'true') {
           this.$magpie.addTrialData(
               Object.assign(
