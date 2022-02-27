@@ -27,6 +27,10 @@
     as fast and accurately as possible.
     <br /> 
     <br />
+    The experiment will take approximately 20 minutes. You can take breaks any time. 
+    Please work with full focus and concentration.
+    <br /> 
+    <br />
     We will start with a few practice trials.
     <br /> 
     <br />
