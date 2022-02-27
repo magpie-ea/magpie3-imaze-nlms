@@ -13,15 +13,35 @@ new_trials <-
     region_number = stringr::str_flatten(region_number, collapse = "|"),
     freqlog10 = stringr::str_flatten(freqlog10, collapse = "|"),
     len = stringr::str_flatten(len, collapse = "|")
-  )
+  ) %>% 
+  ungroup()
 
-write_csv(new_trials, 'imaze-trials-full.csv')
+# main trials
+write_csv(new_trials %>% filter(! is.na(suite)), 'imaze-trials-full.csv')
+# fillers
+write_csv(new_trials %>% filter(condition == "filler"), 'imaze-trials-fillers.csv')
+# practice
+write_csv(new_trials %>% filter(condition == "practice"), 'imaze-trials-practice.csv')
+
+# get conditions
+
+new_trials %>% filter( ! is.na(suite)) %>% 
+  select(suite, condition) %>% 
+  unique() %>% 
+  write_csv('conditions.csv')
 
 # and some statistics
 
 with(new_trials, table(suite,condition))
 
-new_trials %>% group_by(suite, condition, item) %>% 
-  summarize(n()) %>% View()
+new_trials %>% group_by(suite, condition) %>% 
+  summarize(
+    n = n(),
+    item_count = length(item),
+    items = str_c(item, collapse = ",")
+  ) %>% 
+  View()
 
+new_trials %>% pull(item) %>% unique() %>% length()
+  
 filter(new_trials, condition == "that_nogap") %>% View()

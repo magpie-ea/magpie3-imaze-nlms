@@ -36,38 +36,25 @@
 <!-- practice trials -->
 
   <template v-for="(trial, i) of practiceTrials">
-    <mazeTask :trial="trial" :trialNR="i" :key="i"/>
+    <mazeTask :trial="trial" :trialNR="i" :key="i" :progress="i / practiceTrials.length"/>
   </template>
 
   <InstructionScreen :title="'Pause'">
     You have completed the first block. Take a break if you want.
   </InstructionScreen>
 
-  <template v-for="(trial, i) of mainTrials1">
+  <!-- <template v-for="(trial, i) of mainTrials1">
     <mazeTask :trial="trial" :trialNR="i" :key="i"/>
-  </template>
-
-
-
-
-  <!--
-
-      Comment this in, to try out interactive components like the Chat component.
-
-      <ConnectInteractiveScreen />
-
-      <Screen>
-          <Chat :messages.sync="$magpie.measurements.messages"></Chat>
-          <button @click="$magpie.saveAndNextScreen()">Next</button>
-      </Screen>
-
-      -->
+  </template> -->
 
     <PostTestScreen />
 
     <!-- While developing your experiment, using the DebugResults screen is fine,
       once you're going live, you can use the <SubmitResults> screen to automatically send your experimental data to the server. -->
-     <DebugResultsScreen />
+     <!-- <DebugResultsScreen /> -->
+    
+    <SubmitResultsScreen/>
+
   </Experiment>
 </template>
 

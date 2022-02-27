@@ -1,6 +1,6 @@
   <template>
 
-    <Screen>
+    <Screen :progress="progress">
 
       <Slide>
           <KeypressInput
@@ -69,7 +69,7 @@
   cursor: pointer;
   display: inline-block;
   font-family: 'Lato', 'Noto Sans', sans-serif;
-  font-size: 40px;
+  font-size: 30px;
   line-height: 40px;
   font-weight: 700;
   letter-spacing: 0.9px;
@@ -96,10 +96,12 @@ var wordOnRight   = "Dummy"
 var wordOnLeft    = "Yummy"
 var nWords        = 0
 var correct       = 'true'
+var trial         = []
 
 var prepareNextTrial = function(trial){
-    this.responseTimes = [];
+    this.responseTimes = []
     this.responses     = []
+    this.trial         = trial
     this.startTime     = Date.now()
     this.targets       = trial.targets.split("|")
     this.competitors   = trial.competitors.split("|")
@@ -132,11 +134,16 @@ var nextWord = function(response,j) {
     this.responses.push(decodedResponse)
     if (decodedResponse != this.targets[j]) {
         console.log('wrong')
-        this.$magpie.addTrialData({
-            'RTs' : this.responseTimes,
-            'responses' : this.responses,
-            'aborted' : 'true'
-        })
+          this.$magpie.addTrialData(
+              Object.assign(
+                this.trial, 
+                { 
+                  'RTs' : this.responseTimes,
+                  'responses' : this.responses,
+                  'aborted' : 'false'
+                }
+              )
+            )
         this.correct = 'false'
         // $magpie.nextSlide()
     }
@@ -147,11 +154,16 @@ var nextWord = function(response,j) {
         console.log('final word pair reached')
         console.log('final RTs:', this.responseTimes)
         if (this.correct == 'true') {
-            this.$magpie.addTrialData({
-                'RTs' : this.responseTimes,
-                'responses' : this.responses,
-                'aborted' : 'false'
-            })
+          this.$magpie.addTrialData(
+              Object.assign(
+                this.trial, 
+                { 
+                  'RTs' : this.responseTimes,
+                  'responses' : this.responses,
+                  'aborted' : 'false'
+                }
+              )
+            )
         }
         this.$magpie.nextScreen()
     }
@@ -167,6 +179,10 @@ export default {
         trialNR: {
           type: Number,
           required: true
+        },
+        progress: {
+          type: Number,
+          default: undefined
         }
     },
     data() {
