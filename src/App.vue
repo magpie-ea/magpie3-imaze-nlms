@@ -40,12 +40,20 @@
   </template>
 
   <InstructionScreen :title="'Pause'">
+    You have completed the training block. Take a break if you want.
+  </InstructionScreen>
+
+  <template v-for="(trial, i) of mainTrials1">
+    <mazeTask :trial="trial" :trialNR="i" :key="i" :progress="i / mainTrials1.length"/>
+  </template>
+
+<InstructionScreen :title="'Pause'">
     You have completed the first block. Take a break if you want.
   </InstructionScreen>
 
-  <!-- <template v-for="(trial, i) of mainTrials1">
-    <mazeTask :trial="trial" :trialNR="i" :key="i"/>
-  </template> -->
+  <template v-for="(trial, i) of mainTrials2">
+    <mazeTask :trial="trial" :trialNR="i" :key="i" :progress="i / mainTrials2.length"/>
+  </template>
 
     <PostTestScreen />
 
