@@ -34,7 +34,7 @@
     We will start with a few practice trials.
     <br /> 
     <br />
-    Press F to select the right word, and J to select the left word on the screen.
+    Press F to select the left word, and J to select the right word on the screen.
   </InstructionScreen>
 
 <!-- practice trials -->
