@@ -139,7 +139,7 @@ var nextWord = function(response,j) {
                 { 
                   'RTs' : this.responseTimes,
                   'responses' : this.responses,
-                  'aborted' : 'false'
+                  'aborted' : 'true'
                 }
               )
             )

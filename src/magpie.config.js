@@ -5,5 +5,5 @@ export default {
   completionUrl: 'https://...',
   contactEmail: 'test@random.com',
   // Either 'debug', 'directLink' or 'prolific'
-  mode: 'directLink'
+  mode: 'debug'
 };

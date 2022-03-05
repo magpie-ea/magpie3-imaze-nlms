@@ -1,6 +1,6 @@
 library(tidyverse)
 
-old_trials <- read_csv('imaze-trials.csv')
+old_trials <- read_csv('../../magpie3-imaze-nlms/trials/imaze-trials.csv')
 
 new_trials <- 
   old_trials %>% 
